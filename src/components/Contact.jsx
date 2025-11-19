@@ -3,10 +3,7 @@ import { motion } from "framer-motion";
 
 export default function Contact() {
   return (
-    <section
-      id="contact"
-      className="py-20 bg-gray-950 text-gray-100"
-    >
+    <section id="contact" className="py-20 bg-gray-950 text-gray-100">
       <div className="max-w-4xl mx-auto px-6 text-center">
         <motion.h2
           className="text-4xl font-bold mb-6"
@@ -38,19 +35,16 @@ export default function Contact() {
             placeholder="Your Name"
             className="w-full p-4 rounded-lg bg-gray-800 border border-gray-700 text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"
           />
-
           <input
             type="email"
             placeholder="Your Email"
             className="w-full p-4 rounded-lg bg-gray-800 border border-gray-700 text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"
           />
-
           <textarea
             rows="5"
             placeholder="Your Message"
             className="w-full p-4 rounded-lg bg-gray-800 border border-gray-700 text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"
-          ></textarea>
-
+          />
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition"

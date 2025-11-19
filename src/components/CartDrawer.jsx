@@ -1,30 +1,28 @@
 import React from "react";
-import { useCart } from "../components/CartContext";
+import { useCart } from "../contexts/CartContext";
 import { FaTimes } from "react-icons/fa";
 
 export default function CartDrawer({ isOpen, onClose }) {
   const { cartItems, removeFromCart, clearCart } = useCart();
 
-  // Safely calculate total price
   const totalPrice = cartItems.reduce((sum, item) => {
-    let priceNum = 0;
-    if (typeof item.price === "string") {
-      priceNum = Number(item.price.replace(/[^0-9.-]+/g, ""));
-    } else if (typeof item.price === "number") {
-      priceNum = item.price;
-    }
+    const priceNum =
+      typeof item.price === "string"
+        ? Number(item.price.replace(/[^0-9.-]+/g, ""))
+        : item.price;
     return sum + priceNum * (item.quantity || 1);
   }, 0);
 
   return (
-    <div
-      className={`fixed top-0 right-0 h-full w-80 bg-gray-900 text-white shadow-lg transform transition-transform duration-300 ${
-        isOpen ? "translate-x-0" : "translate-x-full"
-      }`}
-    >
+   <div
+  className={`fixed top-0 right-0 h-full w-80 bg-gray-900 text-white shadow-xl transform transition-transform duration-300 z-50 ${
+    isOpen ? "translate-x-0" : "translate-x-full"
+  }`}
+>
+
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <h2 className="text-xl font-bold">Your Cart</h2>
-        <button onClick={onClose}>
+        <button onClick={onClose} aria-label="Close cart">
           <FaTimes />
         </button>
       </div>
@@ -36,7 +34,7 @@ export default function CartDrawer({ isOpen, onClose }) {
           cartItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between bg-gray-800 p-2 rounded"
+              className="flex items-center justify-between bg-gray-800 dark:bg-gray-700 p-2 rounded"
             >
               <img
                 src={item.img}

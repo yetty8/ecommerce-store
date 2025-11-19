@@ -5,21 +5,21 @@ import Products from "./components/Products";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import BackToTopButton from "./components/BackToTopButton";
-import CartDrawer from "./components/CartDrawer";
-import "./App.css";
+import { CartProvider } from "./contexts/CartContext";
 
-function App() {
+export default function App() {
   return (
-    <div className="pt-20 bg-gray-950 min-h-screen">
-      <Navbar />
-      <Hero />
-      <Products />
-      <Contact />
-      <Footer />
-      <BackToTopButton />
-      <CartDrawer />
-    </div>
+    <CartProvider>
+      <div className="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <Navbar />
+        <main>
+          <Hero />
+          <Products />
+          <Contact />
+        </main>
+        <Footer />
+        <BackToTopButton />
+      </div>
+    </CartProvider>
   );
 }
-
-export default App;

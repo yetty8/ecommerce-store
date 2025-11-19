@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion, useAnimation, useInView } from "framer-motion";
-import { useRef, useEffect } from "react";
 
 export default function Hero() {
   const ref = useRef(null);
@@ -8,12 +7,10 @@ export default function Hero() {
   const inView = useInView(ref, { once: true });
 
   useEffect(() => {
-    if (inView) {
-      controls.start("visible");
-    }
+    if (inView) controls.start("visible");
   }, [controls, inView]);
 
-  const variants = {
+  const headingVariants = {
     hidden: { y: -50, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { duration: 0.8 } },
   };
@@ -28,7 +25,7 @@ export default function Hero() {
         className="text-5xl md:text-6xl font-extrabold text-gray-100 mb-6"
         initial="hidden"
         animate={controls}
-        variants={variants}
+        variants={headingVariants}
       >
         Welcome to Yetbarek Store
       </motion.h1>

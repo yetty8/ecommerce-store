@@ -5,17 +5,12 @@ export default function BackToTopButton() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const toggleVisibility = () => {
-      setVisible(window.scrollY > 300);
-    };
-
+    const toggleVisibility = () => setVisible(window.scrollY > 300);
     window.addEventListener("scroll", toggleVisibility);
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
     <button
@@ -24,6 +19,7 @@ export default function BackToTopButton() {
         hover:bg-blue-700 hover:scale-110 ${
           visible ? "opacity-100 scale-100" : "opacity-0 scale-90 pointer-events-none"
         }`}
+      aria-label="Back to top"
     >
       <FaArrowUp size={20} />
     </button>
