@@ -1,9 +1,11 @@
 import React from "react";
 import { useCart } from "../contexts/CartContext";
 import { FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function CartDrawer({ isOpen, onClose }) {
   const { cartItems, removeFromCart, clearCart } = useCart();
+  const navigate = useNavigate();
 
   const totalPrice = cartItems.reduce((sum, item) => {
     const priceNum =
@@ -13,13 +15,21 @@ export default function CartDrawer({ isOpen, onClose }) {
     return sum + priceNum * (item.quantity || 1);
   }, 0);
 
-  return (
-   <div
-  className={`fixed top-0 right-0 h-full w-80 bg-gray-900 text-white shadow-xl transform transition-transform duration-300 z-50 ${
-    isOpen ? "translate-x-0" : "translate-x-full"
-  }`}
->
+  const handleCheckout = () => {
+    onClose(); // close the cart
+    navigate("/checkout");
+  };
 
+  const handleContinueShopping = () => {
+    onClose(); // just close the cart
+  };
+
+  return (
+    <div
+      className={`fixed top-0 right-0 h-full w-80 bg-gray-900 text-white shadow-xl transform transition-transform duration-300 z-50 ${
+        isOpen ? "translate-x-0" : "translate-x-full"
+      }`}
+    >
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <h2 className="text-xl font-bold">Your Cart</h2>
         <button onClick={onClose} aria-label="Close cart">
@@ -27,14 +37,14 @@ export default function CartDrawer({ isOpen, onClose }) {
         </button>
       </div>
 
-      <div className="p-4 flex flex-col gap-4 overflow-y-auto h-[calc(100%-160px)]">
+      <div className="p-4 flex flex-col gap-4 overflow-y-auto h-[calc(100%-200px)]">
         {cartItems.length === 0 ? (
           <p className="text-gray-400">Your cart is empty.</p>
         ) : (
           cartItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between bg-gray-800 dark:bg-gray-700 p-2 rounded"
+              className="flex items-center justify-between bg-gray-800 p-2 rounded"
             >
               <img
                 src={item.img}
@@ -58,14 +68,31 @@ export default function CartDrawer({ isOpen, onClose }) {
         )}
       </div>
 
-      <div className="p-4 border-t border-gray-700">
+      <div className="p-4 border-t border-gray-700 space-y-2">
         <p className="font-bold text-lg">Total: ${totalPrice.toFixed(2)}</p>
+
         <button
-          onClick={clearCart}
-          className="mt-2 w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg transition"
+          onClick={handleCheckout}
+          className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
         >
-          Clear Cart
+          Checkout
         </button>
+
+        <button
+          onClick={handleContinueShopping}
+          className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+        >
+          Continue Shopping
+        </button>
+
+        {cartItems.length > 0 && (
+          <button
+            onClick={clearCart}
+            className="w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
+          >
+            Clear Cart
+          </button>
+        )}
       </div>
     </div>
   );

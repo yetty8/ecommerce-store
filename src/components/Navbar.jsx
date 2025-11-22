@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
 import CartDrawer from "./CartDrawer";
 import { useCart } from "../contexts/CartContext";
+import { useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,16 +10,24 @@ export default function Navbar() {
   const [active, setActive] = useState("hero");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { totalItems } = useCart();
+  const location = useLocation();
 
   const navItems = [
-    { id: "hero", label: "Hero" },
+    { id: "hero", label: "Home" },
     { id: "products", label: "Products" },
     { id: "contact", label: "Contact" },
   ];
 
+  // Scroll highlight for homepage only
   useEffect(() => {
     const handleScroll = () => {
       setShrink(window.scrollY > 60);
+
+      if (location.pathname !== "/") {
+        setActive(""); // no active link outside homepage
+        return;
+      }
+
       let current = "hero";
       navItems.forEach(({ id }) => {
         const section = document.getElementById(id);
@@ -26,13 +35,27 @@ export default function Navbar() {
       });
       setActive(current);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // initial active
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [location.pathname]);
+
+  // Smooth scroll function
   const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setIsOpen(false);
+    const section = document.getElementById(id);
+    if (!section) return;
+
+    const header = document.querySelector("header");
+    const headerHeight = header ? header.offsetHeight : 0;
+
+    const sectionTop = section.offsetTop - headerHeight - 10; // extra padding
+    window.scrollTo({
+      top: sectionTop,
+      behavior: "smooth",
+    });
+
+    setIsOpen(false); // close mobile menu
   };
 
   return (
@@ -50,6 +73,7 @@ export default function Navbar() {
             Yetbarek Store
           </h1>
 
+          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center space-x-10">
             {navItems.map(({ id, label }) => (
               <button
@@ -69,6 +93,7 @@ export default function Navbar() {
             ))}
           </nav>
 
+          {/* Cart + Mobile Menu */}
           <div className="flex items-center space-x-5">
             <button
               className="relative text-gray-100 hover:text-blue-400 transition-transform hover:scale-110"
@@ -93,6 +118,7 @@ export default function Navbar() {
           </div>
         </div>
 
+        {/* Mobile Nav */}
         {isOpen && (
           <nav className="md:hidden bg-gray-900/95 dark:bg-gray-800/95 backdrop-blur-xl mt-3 shadow-xl pb-6 animate-fadeIn">
             <div className="flex flex-col items-center space-y-6 pt-6">
