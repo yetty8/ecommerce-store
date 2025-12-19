@@ -1,11 +1,11 @@
 // src/contexts/CartContext.jsx
-import { createContext, useContext, useReducer, useEffect } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 
 const CartContext = createContext();
 
 const cartReducer = (state, action) => {
   switch (action.type) {
-    case 'ADD_ITEM':
+    case 'ADD_ITEM': {
       const existingItem = state.cartItems.find(
         (item) => item._id === action.payload._id
       );
@@ -19,12 +19,15 @@ const cartReducer = (state, action) => {
               : item
           ),
         };
-      } else {
-        return {
-          ...state,
-          cartItems: [...state.cartItems, { ...action.payload, qty: action.payload.qty || 1 }],
-        };
       }
+      return {
+        ...state,
+        cartItems: [...state.cartItems, { 
+          ...action.payload, 
+          qty: action.payload.qty || 1 
+        }],
+      };
+    }
     
     case 'REMOVE_ITEM':
       return {
@@ -37,7 +40,7 @@ const cartReducer = (state, action) => {
         ...state,
         cartItems: state.cartItems.map((item) =>
           item._id === action.payload.id
-            ? { ...item, qty: action.payload.qty }
+            ? { ...item, qty: Math.max(1, action.payload.qty) } // Ensure qty is never less than 1
             : item
         ),
       };
@@ -51,75 +54,110 @@ const cartReducer = (state, action) => {
     case 'LOAD_CART':
       return {
         ...state,
-        cartItems: action.payload || [],
+        cartItems: Array.isArray(action.payload) ? action.payload : [],
       };
     
     default:
+      console.warn(`Unhandled action type: ${action.type}`);
       return state;
   }
 };
 
+const initialState = {
+  cartItems: [],
+};
+
 export const CartProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(cartReducer, {
-    cartItems: [],
-  });
+  const [state, dispatch] = useReducer(cartReducer, initialState);
 
   // Load cart from localStorage on initial render
   useEffect(() => {
-    const savedCart = localStorage.getItem('cartItems');
-    if (savedCart) {
-      dispatch({ type: 'LOAD_CART', payload: JSON.parse(savedCart) });
+    try {
+      const savedCart = localStorage.getItem('cartItems');
+      if (savedCart) {
+        const parsedCart = JSON.parse(savedCart);
+        if (Array.isArray(parsedCart)) {
+          dispatch({ type: 'LOAD_CART', payload: parsedCart });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load cart from localStorage:', error);
+      // Clear invalid cart data
+      localStorage.removeItem('cartItems');
     }
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
+    try {
+      localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
+    } catch (error) {
+      console.error('Failed to save cart to localStorage:', error);
+    }
   }, [state.cartItems]);
 
-  const addToCart = (product, qty = 1) => {
-    dispatch({ type: 'ADD_ITEM', payload: { ...product, qty } });
-  };
+  const addToCart = useCallback((product, qty = 1) => {
+    if (!product || !product._id) {
+      console.error('Invalid product provided to addToCart');
+      return;
+    }
+    dispatch({ 
+      type: 'ADD_ITEM', 
+      payload: { 
+        ...product, 
+        qty: Math.max(1, Number(qty) || 1) 
+      } 
+    });
+  }, []);
 
-  const removeFromCart = (id) => {
+  const removeFromCart = useCallback((id) => {
+    if (!id) {
+      console.error('No ID provided to removeFromCart');
+      return;
+    }
     dispatch({ type: 'REMOVE_ITEM', payload: id });
-  };
+  }, []);
 
-  const updateQty = (id, qty) => {
-    if (qty < 1) {
+  const updateQty = useCallback((id, qty) => {
+    if (!id) {
+      console.error('No ID provided to updateQty');
+      return;
+    }
+    const quantity = Number(qty);
+    if (isNaN(quantity) || quantity < 1) {
       removeFromCart(id);
     } else {
-      dispatch({ type: 'UPDATE_QTY', payload: { id, qty } });
+      dispatch({ type: 'UPDATE_QTY', payload: { id, qty: quantity } });
     }
-  };
+  }, [removeFromCart]);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     dispatch({ type: 'CLEAR_CART' });
-  };
+  }, []);
 
-  const getCartTotal = () => {
+  const getCartTotal = useCallback(() => {
     return state.cartItems.reduce(
-      (total, item) => total + item.price * item.qty,
+      (total, item) => total + (Number(item.price) || 0) * (Number(item.qty) || 0),
       0
     );
-  };
+  }, [state.cartItems]);
 
-  const getCartCount = () => {
-    return state.cartItems.reduce((total, item) => total + item.qty, 0);
+  const getCartCount = useCallback(() => {
+    return state.cartItems.reduce((total, item) => total + (Number(item.qty) || 0), 0);
+  }, [state.cartItems]);
+
+  const value = {
+    cartItems: state.cartItems,
+    addToCart,
+    removeFromCart,
+    updateQty,
+    clearCart,
+    getCartTotal,
+    getCartCount,
   };
 
   return (
-    <CartContext.Provider
-      value={{
-        cartItems: state.cartItems,
-        addToCart,
-        removeFromCart,
-        updateQty,
-        clearCart,
-        getCartTotal,
-        getCartCount,
-      }}
-    >
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );
@@ -132,3 +170,6 @@ export const useCart = () => {
   }
   return context;
 };
+
+// Add display name for better debugging in React DevTools
+CartContext.displayName = 'CartContext';

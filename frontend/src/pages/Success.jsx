@@ -1,24 +1,25 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-export default function Success() {
+const Success = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px-64px)] px-4 sm:px-6 text-center">
-      <h1 className="text-3xl sm:text-4xl font-bold text-green-600 mb-4">
-        Order Successful!
-      </h1>
-      <p className="text-md sm:text-lg text-gray-700 mb-6">
-        Thank you for your order, Yetty! 🎉  
-      </p>
-
-      <button
-        onClick={() => navigate("/")}
-        className="w-full sm:w-auto max-w-xs py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
-      >
-        Back to Home
-      </button>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+        <h2 className="text-2xl font-bold text-green-600 mb-4">Order Placed Successfully!</h2>
+        <p className="mb-6">Thank you for your purchase. Your order has been received and is being processed.</p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            onClick={() => navigate('/')}
+            className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default Success;

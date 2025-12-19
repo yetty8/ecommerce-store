@@ -2,6 +2,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
 import Header from './components/layout/Header';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import Cart from './pages/Cart';
@@ -20,6 +21,7 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
           </Routes>
         </main>
+        <Footer />
       </div>
     </CartProvider>
   );
