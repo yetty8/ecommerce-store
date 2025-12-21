@@ -9,6 +9,8 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* About Section */}
+          <h1 className="text-red-600">DEPLOY TEST – v2</h1>
+
           <div>
             <h3 className="text-xl font-bold mb-4">YettyStore</h3>
             <p className="text-gray-400">
